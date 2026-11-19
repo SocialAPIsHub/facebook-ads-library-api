@@ -1,0 +1,53 @@
+{
+  "name": "facebook-ads-library-api",
+  "version": "0.1.0",
+  "description": "Meta (Facebook) Ads Library API for Node.js: search ads by keyword or advertiser, paginate, export to CSV. No Meta app review.",
+  "keywords": [
+    "facebook-ads-library",
+    "meta-ads-library",
+    "ads-library-api",
+    "facebook-ads",
+    "instagram-ads",
+    "ad-library",
+    "competitor-ads",
+    "ad-spy",
+    "facebook-api",
+    "socialapis"
+  ],
+  "homepage": "https://socialapis.io/blog/facebook-ads-library-api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SocialAPIsHub/facebook-ads-library-api.git",
+    "directory": "js"
+  },
+  "bugs": "https://github.com/SocialAPIsHub/facebook-ads-library-api/issues",
+  "license": "MIT",
+  "author": "SocialAPIs <support@socialapis.io> (https://socialapis.io)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "bin": {
+    "facebook-ads-library-api": "bin/facebook-ads-library-api.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.3"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "socialapis-sdk": "^0.1.3"
+  }
+}

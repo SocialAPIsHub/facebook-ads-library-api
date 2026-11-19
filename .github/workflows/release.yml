@@ -1,0 +1,73 @@
+name: Release
+
+# Tag `py-vX.Y.Z` publishes python/ to PyPI, tag `js-vX.Y.Z` publishes js/ to npm.
+# Both use trusted publishing (OIDC): no token stored in the repo.
+#
+# PyPI (once): pypi.org → Your account → Publishing → Add a pending publisher:
+#   PyPI project: facebook-ads-library-api, owner SocialAPIsHub,
+#   repository facebook-ads-library-api, workflow release.yml, environment pypi.
+# npm (after the first manual publish): npmjs.com → package → Settings →
+#   Trusted publishing → GitHub Actions, SocialAPIsHub/facebook-ads-library-api, release.yml.
+
+on:
+  push:
+    tags:
+      - "py-v*.*.*"
+      - "js-v*.*.*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pypi:
+    if: startsWith(github.ref_name, 'py-v')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/facebook-ads-library-api/
+    permissions:
+      id-token: write
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build
+      - name: Version matches tag
+        run: |
+          tag="${GITHUB_REF_NAME#py-v}"
+          version=$(python -c "import re;print(re.search(r'__version__ = \"(.+)\"', open('facebook_ads_library_api/__init__.py').read()).group(1))")
+          test "$tag" = "$version" || { echo "::error::tag $tag != version $version"; exit 1; }
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist/
+
+  npm:
+    if: startsWith(github.ref_name, 'js-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm install -g npm@latest
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - name: Version matches tag
+        run: |
+          tag="${GITHUB_REF_NAME#js-v}"
+          version=$(node -p "require('./package.json').version")
+          test "$tag" = "$version" || { echo "::error::tag $tag != version $version"; exit 1; }
+      - run: npm publish --provenance --access public
