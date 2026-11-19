@@ -26,8 +26,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev]"
-      - run: ruff check .
-      - run: ruff format --check .
+      - run: ruff check facebook_ads_library_api tests
+      - run: ruff format --check facebook_ads_library_api tests
       - run: pytest -q
 
   node:
